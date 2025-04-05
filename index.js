@@ -10,6 +10,7 @@ var bodyParser = require("body-parser");
 var express = require("express");
 var app = express();
 var xhub = require("express-x-hub");
+const { respondToComment } = require("./service");
 
 app.use(xhub({ algorithm: "sha1", secret: process.env.APP_SECRET }));
 app.use(bodyParser.json());
@@ -18,7 +19,7 @@ var token = process.env.TOKEN || "token";
 var received_updates = [];
 
 app.get("/", function (req, res) {
-//   console.log(req);
+  //   console.log(req);
   res.send("hello world");
 });
 
@@ -50,12 +51,21 @@ app.post("/facebook", function (req, res) {
   res.sendStatus(200);
 });
 
-app.post("/instagram", function (req, res) {
-  console.log("Instagram request body:");
-  console.log(req.body);
-  // Process the Instagram updates here
-  received_updates.unshift(req.body);
-  res.sendStatus(200);
+app.post("/instagram", async function (req, res) {
+  try {
+    console.log("Instagram request body:");
+    console.log(JSON.stringify(req.body, null, 2));
+    const commentId = req.body.entry[0].changes[0].value.id;
+    const response = await respondToComment({
+      commentId,
+      message: "Check DM",
+    });
+    const result = await response.json();
+    res.status(200).json({ result });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ err: "Internal server error" });
+  }
 });
 
 app.post("/threads", function (req, res) {
