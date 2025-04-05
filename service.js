@@ -4,5 +4,8 @@ export const respondToComment = async ({ commentId, message }) =>
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ message }),
+    body: JSON.stringify({
+      message,
+      access_token: process.env.IG_ACCESS_TOKEN,
+    }),
   });
