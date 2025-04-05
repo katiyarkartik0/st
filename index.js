@@ -61,6 +61,7 @@ app.post("/instagram", async function (req, res) {
       message: "Check DM",
     });
     const result = await response.json();
+    console.log(result,"result")
     res.status(200).json({ result });
   } catch (err) {
     console.log(err);
